@@ -19,24 +19,30 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: Text('WRC 2020'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeBloc, HomeStates>(
       builder: (BuildContext context, HomeStates state) {
         if (state is Loading) {
           return Scaffold(
-            appBar: MyAppBar(),
+            appBar: _buildAppBar(),
             body: LinearProgressIndicator(),
           );
         } else if (state is LoadDataFail) {
           return Scaffold(
-            appBar: MyAppBar(),
+            appBar: _buildAppBar(),
             body: Center(child: Text(state.error)),
           );
         } else {
-          data = (state as LoadDataSuccess).data['rallies']['results'];
+          data = (state as LoadDataSuccess).data['rallies'];
           return Scaffold(
-            appBar: MyAppBar(),
+            appBar: _buildAppBar(),
             body: _buildBody(),
           );
         }
@@ -54,8 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 4.0,
             margin: EdgeInsets.all(8.0),
             child: ListTile(
-              leading: Text(item['round']),
+              // leading: Text(item['round']),
               title: Text(item['name']),
+              // trailing: Text(item['startDate']),
             ),
           );
         },
