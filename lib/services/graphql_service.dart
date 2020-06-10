@@ -4,7 +4,9 @@ class GraphQLService {
   GraphQLClient _client;
 
   GraphQLService() {
-    HttpLink link = HttpLink(uri: 'https://rickandmortyapi.com/graphql/');
+    HttpLink link = HttpLink(
+        uri:
+            'https://api-eu-central-1.graphcms.com/v2/ckb9brnm01mrr01wd8p0h3cuc/master');
 
     _client = GraphQLClient(link: link, cache: InMemoryCache());
   }
