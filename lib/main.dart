@@ -14,6 +14,7 @@ String query = r'''
     rallies {
       round
       name
+      rallyStatus
     }
   }
 ''';

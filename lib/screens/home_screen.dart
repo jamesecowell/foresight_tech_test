@@ -13,6 +13,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List data = [];
+  String query = r'''
+  query Rallies {
+    rallies {
+      round
+      name
+      rallyStatus
+    }
+  }
+''';
 
   @override
   void initState() {
@@ -32,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (state is Loading) {
           return Scaffold(
             appBar: _buildAppBar(),
-            body: LinearProgressIndicator(),
+            body: Center(child: CircularProgressIndicator()),
           );
         } else if (state is LoadDataFail) {
           return Scaffold(
@@ -51,23 +60,51 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody() {
-    return Container(
-      child: ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (BuildContext context, int index) {
-          var item = data[index];
-          return Card(
-            elevation: 4.0,
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              // leading: Text(item['round']),
-              title: Text(item['name']),
-              // trailing: Text(item['startDate']),
-            ),
-          );
-        },
-      ),
-    );
+    return RefreshIndicator(
+        child: Container(
+          child: ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (BuildContext context, int index) {
+              var item = data[index];
+              return Card(
+                elevation: 4.0,
+                margin: EdgeInsets.all(8.0),
+                child: ListTile(
+                  // leading: Text(item['round']),
+                  title: Text(item['name']),
+                  trailing: Container(
+                    padding: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: item['rallyStatus'] == 'cancelled'
+                          ? Colors.red.withOpacity(0.3)
+                          : item['rallyStatus'] == 'postponed'
+                              ? Colors.amber.withOpacity(0.3)
+                              : item['rallyStatus'] == 'complete'
+                                  ? Colors.blue.withOpacity(0.3)
+                                  : Colors.green.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(32.0),
+                    ),
+                    child: Text(
+                      item['rallyStatus'],
+                      style: TextStyle(
+                        color: item['rallyStatus'] == 'cancelled'
+                            ? Colors.red
+                            : item['rallyStatus'] == 'postponed'
+                                ? Colors.amber
+                                : item['rallyStatus'] == 'complete'
+                                    ? Colors.blue
+                                    : Colors.green,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        onRefresh: () {
+          BlocProvider.of<HomeBloc>(context).add(RefreshHomeData(query));
+        });
   }
 
   @override
