@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foresight_tech_test/blocs/home/home.dart';
@@ -13,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List data = [];
+  Completer<void> _refreshCompleter;
+
   String query = r'''
   query Rallies {
     rallies {
@@ -26,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _refreshCompleter = Completer<void>();
   }
 
   AppBar _buildAppBar() {
@@ -60,6 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBody() {
+    _refreshCompleter?.complete();
+    _refreshCompleter = Completer();
+
     return RefreshIndicator(
         child: Container(
           child: ListView.builder(
@@ -104,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         onRefresh: () {
           BlocProvider.of<HomeBloc>(context).add(RefreshHomeData(query));
+          return _refreshCompleter.future;
         });
   }
 

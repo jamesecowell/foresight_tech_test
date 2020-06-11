@@ -20,23 +20,48 @@ class HomeBloc extends Bloc<HomeEvents, HomeStates> {
   }
 
   Stream<HomeStates> _mapFetchHomeDataToStates(FetchHomeData event) async* {
-    final query = event.query;
-    final variables = event.variables ?? null;
+    if (event is FetchHomeData) {
+      final query = event.query;
+      final variables = event.variables ?? null;
 
-    try {
-      final result = await service.performMutation(query, variables: variables);
+      try {
+        final result =
+            await service.performMutation(query, variables: variables);
 
-      if (result.hasException) {
-        print('graphQLErrors: ${result.exception.graphqlErrors.toString()}');
-        print('clientErrors: ${result.exception.clientException.toString()}');
-        yield LoadDataFail(result.exception.graphqlErrors[0]);
-      } else {
-        yield LoadDataSuccess(result.data);
-        print('load success');
+        if (result.hasException) {
+          print('graphQLErrors: ${result.exception.graphqlErrors.toString()}');
+          print('clientErrors: ${result.exception.clientException.toString()}');
+          yield LoadDataFail(result.exception.graphqlErrors[0]);
+        } else {
+          yield LoadDataSuccess(result.data);
+          print('load success');
+        }
+      } catch (err) {
+        print(err);
+        yield LoadDataFail(err.toString());
       }
-    } catch (err) {
-      print(err);
-      yield LoadDataFail(err.toString());
+    }
+
+    if (event is RefreshHomeData) {
+      final query = event.query;
+      final variables = event.variables ?? null;
+
+      try {
+        final result =
+            await service.performMutation(query, variables: variables);
+
+        if (result.hasException) {
+          print('graphQLErrors: ${result.exception.graphqlErrors.toString()}');
+          print('clientErrors: ${result.exception.clientException.toString()}');
+          yield LoadDataFail(result.exception.graphqlErrors[0]);
+        } else {
+          yield LoadDataSuccess(result.data);
+          print('load success');
+        }
+      } catch (err) {
+        print(err);
+        yield LoadDataFail(err.toString());
+      }
     }
   }
 }
